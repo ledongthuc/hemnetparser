@@ -1,0 +1,94 @@
+package hemnetparser
+
+import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+)
+
+func Parse(url string) (Output, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return Output{}, fmt.Errorf("Error when get data from url %v: %v", url, err)
+	}
+
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		return Output{}, fmt.Errorf("Got error code when loading url: %d, %s", res.StatusCode, res.Status)
+	}
+
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return Output{}, fmt.Errorf("Got read data from website: %v, %s", url, err)
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(data)))
+	if err != nil {
+		return Output{}, fmt.Errorf("Got read data from website: %v, %s", url, err)
+	}
+
+	re := regexp.MustCompile("\"construction_year\":\"(\\w+)\"")
+	matches := re.FindStringSubmatch(string(data))
+	constructionYear := ""
+	if len(matches) > 0 {
+		constructionYear = matches[len(matches)-1]
+	}
+
+	// Find the review items
+	output := Output{
+		URL:        url,
+		StreetName: doc.Find(".property-address__street").Text(),
+		Area:       doc.Find(".property-address__area").Text(),
+		AreaDetail: AreaDetail{
+			PostalCity:   parseJson("postal_city", data),
+			Municipality: parseJson("municipality", data),
+			County:       parseJson("county", data),
+			Country:      parseJson("country", data),
+		},
+		ConstructionYear: constructionYear,
+		HousingForm:      parseJson("housing_form", data),
+		Tenure:           parseJson("tenure", data),
+	}
+	output.NumberOfRooms, _ = strconv.ParseFloat(parseJson("rooms", data), 32)
+	output.LivingArea, _ = strconv.ParseFloat(parseJson("living_area", data), 32)
+	output.Borattavgift, _ = strconv.ParseFloat(parseJson("borattavgift", data), 64)
+	output.Driftkostnad, _ = strconv.ParseFloat(parseJson("driftkostnad", data), 64)
+	output.Price, _ = strconv.ParseFloat(parseJson("price", data), 64)
+	output.PricePerM2, _ = strconv.ParseFloat(parseJson("price_per_m2", data), 64)
+	return output, nil
+}
+
+// parse json value from json key in a document
+func parseJson(key string, json []byte) string {
+	jsonStr := string(json)
+	re := regexp.MustCompile("\"" + key + "\"\\s*:\\s*")
+	matches := re.FindStringIndex(jsonStr)
+	if len(matches) != 2 {
+		return ""
+	}
+
+	var value strings.Builder
+	var lastChar byte
+	inQuotes := false
+	for i := matches[1]; i < len(jsonStr); i++ {
+		lastChar = jsonStr[i]
+		if !inQuotes && jsonStr[i] == ',' {
+			break
+		}
+		if jsonStr[i] == '"' {
+			if lastChar != '\\' {
+				inQuotes = !inQuotes
+				continue
+			}
+		}
+		value.WriteByte(jsonStr[i])
+		lastChar = jsonStr[i]
+	}
+	return value.String()
+}
