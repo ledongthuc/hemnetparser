@@ -17,12 +17,14 @@ import (
 	"google.golang.org/api/sheets/v4"
 )
 
+// Scope and Status of sheet line processing
 const (
 	ScopeURL        = "https://www.googleapis.com/auth/spreadsheets"
 	StatusProcessed = "Processed"
 	StatusSkip      = "Skipped"
 )
 
+// Default data of configuration
 const (
 	DefaultSheetName = "Sheet1"
 	DefaultColumns   = "area_detail.postal_city,housing_form,price,,,,number_of_rooms,living_area,,borattavgift,driftkostnad,construction_year,street_name"

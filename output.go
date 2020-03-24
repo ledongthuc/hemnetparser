@@ -30,10 +30,12 @@ type AreaDetail struct {
 	Country      string `json:"country"`
 }
 
+// ToJSON convert output object to JSON
 func (o Output) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(o, "", " ")
 }
 
+// ToXML convert output object to JSON
 func (o Output) ToXML() ([]byte, error) {
 	return xml.MarshalIndent(o, "", " ")
 }
