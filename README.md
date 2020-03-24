@@ -71,4 +71,5 @@ hemnet-parser --format=googlesheet --credential=credentials.json --sheet-id=1S0X
 ```
 
 credential: Turn on Google Sheet APIs and download credentials.json from https://developers.google.com/sheets/api/quickstart/go
+
 sheet-id: https://developers.google.com/sheets/api/guides/concepts
