@@ -114,8 +114,8 @@ func TestConfiguration_Default(t *testing.T) {
 				SheetName:            "mnn",
 			},
 			wants: wants{
-				SheetName: "mnn",
-				Columns:   "uuu",
+				SheetName: DefaultSheetName,
+				Columns:   DefaultColumns,
 			},
 		},
 	}
