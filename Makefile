@@ -9,6 +9,8 @@ TEST_URL=https://www.hemnet.se/bostad/lagenhet-2rum-bromma-beckomberga-stockholm
 SHEET_ID=1S0Xzpl_a3SFGnkFWCw7M1t_NXa2VZV42Lxh70G9PTlo
 
 all: test build
+test:
+	$(GOTEST) ./...
 build: 
 	$(GOBUILD) -o ./output/$(BINARY_NAME) -v
 run:
