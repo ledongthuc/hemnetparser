@@ -114,8 +114,21 @@ func TestConfiguration_Default(t *testing.T) {
 				SheetName:            "mnn",
 			},
 			wants: wants{
-				SheetName: DefaultSheetName,
+				SheetName: "mnn",
 				Columns:   DefaultColumns,
+			},
+		},
+		{
+			name: "Miss SheetName",
+			fields: fields{
+				GoogleCredentialPath: "XYZ",
+				SpreadsheetID:        "ABC",
+				NoSkipHeader:         5,
+				Columns:              "uuu",
+			},
+			wants: wants{
+				SheetName: DefaultSheetName,
+				Columns:   "uuu",
 			},
 		},
 	}
