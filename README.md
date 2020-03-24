@@ -2,6 +2,8 @@
 
 # Hemnet Parser
 
+Library and a simple commandline to parse information from Hemnet URL to JSON, XML or update it to Google sheet
+
 TODO:
  - Document to use library
  - Document to use command

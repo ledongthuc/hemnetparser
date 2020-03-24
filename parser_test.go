@@ -44,7 +44,6 @@ Gör en spontanansökan på https://jobba.hemnet.se/
     <link rel="preload" href="https://assets.hemnet.se/assets/fonts/hemnetslabbold_mrf1301-webfont.woff2" as="font" type="font/woff2" crossorigin>
 
     <meta name="csrf-param" content="authenticity_token" />
-<meta name="csrf-token" content="MQF6hO+kKMRK90fSC4WOwsSP42e/xL+nu6/Gss1qEnimG5ITfys2WAnDI071Hig8HyrYYmUvhBYtO/cWLQvMCg==" />
     <link rel="shortcut icon" type="image/png" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="https://assets.hemnet.se/assets/images/apple-touch-icon.png">
 
