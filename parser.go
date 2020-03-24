@@ -89,7 +89,6 @@ func parseJson(key string, documentB []byte) string {
 			}
 		}
 		value.WriteByte(document[i])
-		lastChar = document[i]
 	}
 	return value.String()
 }
