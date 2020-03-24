@@ -11,6 +11,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// Parse
 func Parse(url string) (Output, error) {
 	res, err := http.Get(url)
 	if err != nil {
@@ -64,11 +65,11 @@ func Parse(url string) (Output, error) {
 	return output, nil
 }
 
-// parse json value from json key in a document
-func parseJson(key string, json []byte) string {
-	jsonStr := string(json)
+// parseJson value from json key in a document
+func parseJson(key string, documentB []byte) string {
+	document := string(documentB)
 	re := regexp.MustCompile("\"" + key + "\"\\s*:\\s*")
-	matches := re.FindStringIndex(jsonStr)
+	matches := re.FindStringIndex(document)
 	if len(matches) != 2 {
 		return ""
 	}
@@ -76,19 +77,19 @@ func parseJson(key string, json []byte) string {
 	var value strings.Builder
 	var lastChar byte
 	inQuotes := false
-	for i := matches[1]; i < len(jsonStr); i++ {
-		lastChar = jsonStr[i]
-		if !inQuotes && jsonStr[i] == ',' {
+	for i := matches[1]; i < len(document); i++ {
+		lastChar = document[i]
+		if !inQuotes && document[i] == ',' {
 			break
 		}
-		if jsonStr[i] == '"' {
+		if document[i] == '"' {
 			if lastChar != '\\' {
 				inQuotes = !inQuotes
 				continue
 			}
 		}
-		value.WriteByte(jsonStr[i])
-		lastChar = jsonStr[i]
+		value.WriteByte(document[i])
+		lastChar = document[i]
 	}
 	return value.String()
 }
