@@ -11,7 +11,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// Parse parses information from URL to ouput object
+// Parse parses information from URL to output object
 func Parse(url string) (Output, error) {
 	res, err := http.Get(url)
 	if err != nil {
