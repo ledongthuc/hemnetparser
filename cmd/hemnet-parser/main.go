@@ -24,6 +24,7 @@ func init() {
 
 	flag.StringVar(&googleConfiguration.GoogleCredentialPath, "credential", "", "Credential file path from https://developers.google.com/sheets/api/quickstart/go")
 	flag.StringVar(&googleConfiguration.SpreadsheetID, "sheet-id", "", "https://developers.google.com/sheets/api/guides/concepts#spreadsheet_id")
+	flag.StringVar(&googleConfiguration.SheetName, "sheet-name", "Sheet1", "Sheet name (tab) of sheet file")
 	flag.IntVar(&googleConfiguration.NoSkipHeader, "skipheader", 0, "number of header will be skipped. Default=0")
 
 }
