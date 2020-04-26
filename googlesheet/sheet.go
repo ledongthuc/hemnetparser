@@ -19,15 +19,14 @@ import (
 
 // Scope and Status of sheet line processing
 const (
-	ScopeURL        = "https://www.googleapis.com/auth/spreadsheets"
-	StatusProcessed = "Processed"
-	StatusSkip      = "Skipped"
+	ScopeURL   = "https://www.googleapis.com/auth/spreadsheets"
+	StatusSkip = "Skipped"
 )
 
 // Default data of configuration
 const (
 	DefaultSheetName = "Sheet1"
-	DefaultColumns   = "area_detail.postal_city,housing_form,price,,,,number_of_rooms,living_area,,borattavgift,driftkostnad,construction_year,street_name"
+	DefaultColumns   = "area_detail.postal_city,housing_form,price,selling_price,development_price,development_price_percent,number_of_rooms,living_area,,borattavgift,driftkostnad,construction_year,street_name"
 )
 
 // Configuration is config to process GoogleSheet updating
@@ -125,11 +124,13 @@ func processRow(row []interface{}, columns []string) ([]interface{}, error) {
 		url = fmt.Sprintf("%v", row[0])
 	}
 
-	var status string
+	var currentStatus string
 	if len(row) > 1 {
-		status = fmt.Sprintf("%v", row[1])
+		currentStatus = fmt.Sprintf("%v", row[1])
 	}
-	if status == StatusProcessed || status == StatusSkip {
+	if currentStatus == string(hemnetparser.StatusDeactived) ||
+		currentStatus == string(hemnetparser.StatusSold) ||
+		currentStatus == StatusSkip {
 		return row, nil
 	}
 
@@ -138,52 +139,119 @@ func processRow(row []interface{}, columns []string) ([]interface{}, error) {
 		return row, err
 	}
 
-	status = StatusProcessed
 	response := []interface{}{
 		url,
-		status,
+		output.Status,
 	}
-	for _, column := range columns {
-		response = append(response, getDataFromColumn(strings.TrimSpace(column), output))
+	for index, column := range columns {
+		var defaultValue interface{}
+		if len(row) >= index+1+2 {
+			defaultValue = row[index+2]
+		}
+		if column == "" {
+			response = append(response, defaultValue)
+			continue
+		}
+		response = append(response, getDataFromColumn(strings.TrimSpace(column), output, defaultValue))
 	}
 
 	return response, nil
 }
 
-func getDataFromColumn(columnName string, hemnetData hemnetparser.Output) interface{} {
+func getDataFromColumn(columnName string, hemnetData hemnetparser.Output, defaultValue interface{}) interface{} {
 	switch columnName {
 	case "url":
 		return hemnetData.URL
 	case "street_name":
-		return hemnetData.StreetName
+		if hemnetData.StreetName == nil {
+			return defaultValue
+		}
+		return *hemnetData.StreetName
 	case "area":
-		return hemnetData.Area
+		if hemnetData.Area == nil {
+			return defaultValue
+		}
+		return *hemnetData.Area
 	case "area_detail.postal_city":
-		return hemnetData.AreaDetail.PostalCity
+		if hemnetData.AreaDetail.PostalCity == nil {
+			return defaultValue
+		}
+		return *hemnetData.AreaDetail.PostalCity
 	case "area_detail.municipality":
-		return hemnetData.AreaDetail.Municipality
+		if hemnetData.AreaDetail.Municipality == nil {
+			return defaultValue
+		}
+		return *hemnetData.AreaDetail.Municipality
 	case "area_detail.county":
-		return hemnetData.AreaDetail.County
+		if hemnetData.AreaDetail.County == nil {
+			return defaultValue
+		}
+		return *hemnetData.AreaDetail.County
 	case "area_detail.country":
-		return hemnetData.AreaDetail.Country
+		if hemnetData.AreaDetail.Country == nil {
+			return defaultValue
+		}
+		return *hemnetData.AreaDetail.Country
 	case "construction_year":
-		return hemnetData.ConstructionYear
+		if hemnetData.ConstructionYear == nil {
+			return defaultValue
+		}
+		return *hemnetData.ConstructionYear
 	case "number_of_rooms":
-		return hemnetData.NumberOfRooms
+		if hemnetData.NumberOfRooms == nil {
+			return defaultValue
+		}
+		return *hemnetData.NumberOfRooms
 	case "living_area":
+		if hemnetData.NumberOfRooms == nil {
+			return defaultValue
+		}
 		return hemnetData.LivingArea
 	case "borattavgift":
-		return hemnetData.Borattavgift
+		if hemnetData.Borattavgift == nil {
+			return defaultValue
+		}
+		return *hemnetData.Borattavgift
 	case "driftkostnad":
-		return hemnetData.Driftkostnad
+		if hemnetData.Driftkostnad == nil {
+			return defaultValue
+		}
+		return *hemnetData.Driftkostnad
 	case "price":
-		return hemnetData.Price
+		if hemnetData.Price == nil {
+			return defaultValue
+		}
+		return *hemnetData.Price
 	case "price_per_m_2":
-		return hemnetData.PricePerM2
+		if hemnetData.PricePerM2 == nil {
+			return defaultValue
+		}
+		return *hemnetData.PricePerM2
+	case "selling_price":
+		if hemnetData.SellingPrice == nil {
+			return defaultValue
+		}
+		return *hemnetData.SellingPrice
+	case "development_price":
+		if hemnetData.DevelopmentPrice == nil {
+			return defaultValue
+		}
+		return *hemnetData.DevelopmentPrice
+	case "development_price_percent":
+		if hemnetData.DevelopmentPricePercent == nil {
+			return defaultValue
+		}
+		return *hemnetData.DevelopmentPricePercent
 	case "housing_form":
-		return hemnetData.HousingForm
+		if hemnetData.HousingForm == nil {
+			return defaultValue
+		}
+		return *hemnetData.HousingForm
 	case "tenure":
-		return hemnetData.Tenure
+		if hemnetData.Tenure == nil {
+			return defaultValue
+		}
+		return *hemnetData.Tenure
 	}
 	return ""
 }

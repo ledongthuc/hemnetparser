@@ -44,24 +44,39 @@ func Parse(url string) (Output, error) {
 	// Find the review items
 	output := Output{
 		URL:        url,
-		StreetName: doc.Find(".property-address__street").Text(),
-		Area:       doc.Find(".property-address__area").Text(),
+		StreetName: StringValueOrNil(doc.Find(".property-address__street").Text()),
+		Area:       StringValueOrNil(doc.Find(".property-address__area").Text()),
 		AreaDetail: AreaDetail{
-			PostalCity:   parseJson("postal_city", data),
-			Municipality: parseJson("municipality", data),
-			County:       parseJson("county", data),
-			Country:      parseJson("country", data),
+			PostalCity:   StringValueOrNil(parseJson("postal_city", data)),
+			Municipality: StringValueOrNil(parseJson("municipality", data)),
+			County:       StringValueOrNil(parseJson("county", data)),
+			Country:      StringValueOrNil(parseJson("country", data)),
 		},
-		ConstructionYear: constructionYear,
-		HousingForm:      parseJson("housing_form", data),
-		Tenure:           parseJson("tenure", data),
+		ConstructionYear: StringValueOrNil(constructionYear),
+		HousingForm:      StringValueOrNil(parseJson("housing_form", data)),
+		Tenure:           StringValueOrNil(parseJson("tenure", data)),
+		Status:           parseStatus(data),
 	}
-	output.NumberOfRooms, _ = strconv.ParseFloat(parseJson("rooms", data), 32)
-	output.LivingArea, _ = strconv.ParseFloat(parseJson("living_area", data), 32)
-	output.Borattavgift, _ = strconv.ParseFloat(parseJson("borattavgift", data), 64)
-	output.Driftkostnad, _ = strconv.ParseFloat(parseJson("driftkostnad", data), 64)
-	output.Price, _ = strconv.ParseFloat(parseJson("price", data), 64)
-	output.PricePerM2, _ = strconv.ParseFloat(parseJson("price_per_m2", data), 64)
+	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err == nil {
+		output.NumberOfRooms = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("living_area", data), 32); err == nil {
+		output.LivingArea = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("borattavgift", data), 64); err == nil {
+		output.Borattavgift = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("driftkostnad", data), 64); err == nil {
+		output.Driftkostnad = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("price", data), 64); err == nil {
+		output.Price = &v
+	}
+	output.SellingPrice = parseSellingPrice(data, doc, output.Status)
+	if v, err := strconv.ParseFloat(parseJson("price_per_m2", data), 64); err == nil {
+		output.PricePerM2 = &v
+	}
+	output.CalculateDevelopment()
 	return output, nil
 }
 
@@ -91,4 +106,29 @@ func parseJson(key string, documentB []byte) string {
 		value.WriteByte(document[i])
 	}
 	return value.String()
+}
+
+func parseStatus(documentB []byte) Status {
+	if strings.Contains(string(documentB), `"status":"deactivated"`) ||
+		strings.Contains(string(documentB), `"status":"deactivated_before_open_house_day"`) {
+		return StatusDeactived
+	}
+	if strings.Contains(string(documentB), `&quot;status&quot;:&quot;sold&quot;`) {
+		return StatusSold
+	}
+	return StatusProcessing
+}
+
+func parseSellingPrice(documentB []byte, doc *goquery.Document, status Status) *float64 {
+	if v, err := strconv.ParseFloat(parseJson("selling_price", documentB), 64); err == nil {
+		return &v
+	}
+	if status == StatusDeactived {
+		rawSellingPrice := doc.Find(".removed-listing__price").Text()
+		rawSellingPrice = stripSpaces(strings.ReplaceAll(rawSellingPrice, "kr", ""))
+		if v, err := strconv.ParseFloat(rawSellingPrice, 64); err == nil {
+			return &v
+		}
+	}
+	return nil
 }
