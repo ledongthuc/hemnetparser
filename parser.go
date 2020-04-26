@@ -56,22 +56,22 @@ func Parse(url string) (Output, error) {
 		HousingForm:      StringValueOrNil(parseJson("housing_form", data)),
 		Tenure:           StringValueOrNil(parseJson("tenure", data)),
 	}
-	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err == nil {
 		output.NumberOfRooms = &v
 	}
-	if v, err := strconv.ParseFloat(parseJson("living_area", data), 32); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("living_area", data), 32); err == nil {
 		output.LivingArea = &v
 	}
-	if v, err := strconv.ParseFloat(parseJson("borattavgift", data), 64); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("borattavgift", data), 64); err == nil {
 		output.Borattavgift = &v
 	}
-	if v, err := strconv.ParseFloat(parseJson("driftkostnad", data), 64); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("driftkostnad", data), 64); err == nil {
 		output.Driftkostnad = &v
 	}
-	if v, err := strconv.ParseFloat(parseJson("price", data), 64); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("price", data), 64); err == nil {
 		output.Price = &v
 	}
-	if v, err := strconv.ParseFloat(parseJson("price_per_m2", data), 64); err != nil {
+	if v, err := strconv.ParseFloat(parseJson("price_per_m2", data), 64); err == nil {
 		output.PricePerM2 = &v
 	}
 	return output, nil
