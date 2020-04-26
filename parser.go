@@ -55,6 +55,7 @@ func Parse(url string) (Output, error) {
 		ConstructionYear: StringValueOrNil(constructionYear),
 		HousingForm:      StringValueOrNil(parseJson("housing_form", data)),
 		Tenure:           StringValueOrNil(parseJson("tenure", data)),
+		Status:           parseStatus(data),
 	}
 	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err == nil {
 		output.NumberOfRooms = &v
@@ -71,9 +72,11 @@ func Parse(url string) (Output, error) {
 	if v, err := strconv.ParseFloat(parseJson("price", data), 64); err == nil {
 		output.Price = &v
 	}
+	output.SellingPrice = parseSellingPrice(data, doc, output.Status)
 	if v, err := strconv.ParseFloat(parseJson("price_per_m2", data), 64); err == nil {
 		output.PricePerM2 = &v
 	}
+	output.CalculateDevelopment()
 	return output, nil
 }
 
@@ -103,4 +106,29 @@ func parseJson(key string, documentB []byte) string {
 		value.WriteByte(document[i])
 	}
 	return value.String()
+}
+
+func parseStatus(documentB []byte) Status {
+	if strings.Contains(string(documentB), `"status":"deactivated"`) ||
+		strings.Contains(string(documentB), `"status":"deactivated_before_open_house_day"`) {
+		return StatusDeactived
+	}
+	if strings.Contains(string(documentB), `&quot;status&quot;:&quot;sold&quot;`) {
+		return StatusSold
+	}
+	return StatusProcessing
+}
+
+func parseSellingPrice(documentB []byte, doc *goquery.Document, status Status) *float64 {
+	if v, err := strconv.ParseFloat(parseJson("selling_price", documentB), 64); err == nil {
+		return &v
+	}
+	if status == StatusDeactived {
+		rawSellingPrice := doc.Find(".removed-listing__price").Text()
+		rawSellingPrice = stripSpaces(strings.ReplaceAll(rawSellingPrice, "kr", ""))
+		if v, err := strconv.ParseFloat(rawSellingPrice, 64); err == nil {
+			return &v
+		}
+	}
+	return nil
 }

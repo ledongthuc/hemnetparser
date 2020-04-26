@@ -5,14 +5,15 @@ GOTEST=$(GOCMD) test
 BINARY_NAME=hemnet-parser
 DOCKER_IMG_NAME=$(BINARY_NAME)
 
-TEST_URL=https://www.hemnet.se/bostad/lagenhet-2rum-bromma-beckomberga-stockholms-kommun-agatvagen-26-16065891
+TEST_URL=https://www.hemnet.se/bostad/lagenhet-2rum-stockholms-kommun-hasselby-torg-2-16554758?utm_campaign=bevaka&utm_content=rad1&utm_medium=html&utm_source=mail&utm_term=basic
+# TEST_URL=https://www.hemnet.se/salda/1132777?utm_campaign=slutprismail&utm_content=objekt&utm_medium=html&utm_source=mail
 SHEET_ID=1S0Xzpl_a3SFGnkFWCw7M1t_NXa2VZV42Lxh70G9PTlo
 
 all: test build
 test:
 	$(GOTEST) ./...
 build: 
-	$(GOBUILD) -o ./output/$(BINARY_NAME) -v
+	$(GOBUILD) -o ./output/$(BINARY_NAME) -v ./cmd/hemnet-parser/main.go
 run:
 	$(GORUN) ./cmd/hemnet-parser/main.go --format=json $(TEST_URL)
 run-sheet:

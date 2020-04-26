@@ -1,5 +1,10 @@
 package hemnetparser
 
+import (
+	"strings"
+	"unicode"
+)
+
 // PtrFloat64 get pointer of value float64
 func PtrFloat64(val float64) *float64 {
 	return &val
@@ -34,4 +39,14 @@ func StringValueOrNil(val string) *string {
 		return nil
 	}
 	return &val
+}
+
+// stripSpaces remove all space characters
+func stripSpaces(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}, str)
 }
