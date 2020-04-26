@@ -21,6 +21,11 @@ func TestPtrFloat64(t *testing.T) {
 			got := PtrFloat64(tt.val)
 			if got != tt.want && (got == nil || tt.want == nil) {
 				t.Errorf("PtrFloat64() = %v, want %v", got, tt.want)
+				return
+			}
+
+			if got == nil && tt.want == nil {
+				return
 			}
 
 			if *got != *tt.want {
@@ -45,6 +50,11 @@ func TestPtrString(t *testing.T) {
 			got := PtrString(tt.val)
 			if got != tt.want && (got == nil || tt.want == nil) {
 				t.Errorf("PtrString() = %v, want %v", got, tt.want)
+				return
+			}
+
+			if got == nil && tt.want == nil {
+				return
 			}
 
 			if *got != *tt.want {
@@ -91,6 +101,35 @@ func TestGetString(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := GetString(tt.val); got != tt.want {
 				t.Errorf("GetString() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestStringValueOrNil(t *testing.T) {
+	value := "Value"
+	tests := []struct {
+		name string
+		val  string
+		want *string
+	}{
+		{name: "Empty", val: "", want: nil},
+		{name: "Value", val: "Value", want: &value},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := StringValueOrNil(tt.val)
+			if got != tt.want && (got == nil || tt.want == nil) {
+				t.Errorf("StringValueOrNil() = %v, want %v", got, tt.want)
+				return
+			}
+
+			if got == nil && tt.want == nil {
+				return
+			}
+
+			if *got != *tt.want {
+				t.Errorf("StringValueOrNil() = %v, want %v", *got, *tt.want)
 			}
 		})
 	}

@@ -27,3 +27,11 @@ func GetString(val *string) string {
 		return *val
 	}
 }
+
+// StringValueOrNil convert empty if it's nil
+func StringValueOrNil(val string) *string {
+	if len(val) == 0 {
+		return nil
+	}
+	return &val
+}

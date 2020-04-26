@@ -44,24 +44,36 @@ func Parse(url string) (Output, error) {
 	// Find the review items
 	output := Output{
 		URL:        url,
-		StreetName: doc.Find(".property-address__street").Text(),
-		Area:       doc.Find(".property-address__area").Text(),
+		StreetName: StringValueOrNil(doc.Find(".property-address__street").Text()),
+		Area:       StringValueOrNil(doc.Find(".property-address__area").Text()),
 		AreaDetail: AreaDetail{
-			PostalCity:   parseJson("postal_city", data),
-			Municipality: parseJson("municipality", data),
-			County:       parseJson("county", data),
-			Country:      parseJson("country", data),
+			PostalCity:   StringValueOrNil(parseJson("postal_city", data)),
+			Municipality: StringValueOrNil(parseJson("municipality", data)),
+			County:       StringValueOrNil(parseJson("county", data)),
+			Country:      StringValueOrNil(parseJson("country", data)),
 		},
-		ConstructionYear: constructionYear,
-		HousingForm:      parseJson("housing_form", data),
-		Tenure:           parseJson("tenure", data),
+		ConstructionYear: StringValueOrNil(constructionYear),
+		HousingForm:      StringValueOrNil(parseJson("housing_form", data)),
+		Tenure:           StringValueOrNil(parseJson("tenure", data)),
 	}
-	output.NumberOfRooms, _ = strconv.ParseFloat(parseJson("rooms", data), 32)
-	output.LivingArea, _ = strconv.ParseFloat(parseJson("living_area", data), 32)
-	output.Borattavgift, _ = strconv.ParseFloat(parseJson("borattavgift", data), 64)
-	output.Driftkostnad, _ = strconv.ParseFloat(parseJson("driftkostnad", data), 64)
-	output.Price, _ = strconv.ParseFloat(parseJson("price", data), 64)
-	output.PricePerM2, _ = strconv.ParseFloat(parseJson("price_per_m2", data), 64)
+	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err != nil {
+		output.NumberOfRooms = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("living_area", data), 32); err != nil {
+		output.LivingArea = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("borattavgift", data), 64); err != nil {
+		output.Borattavgift = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("driftkostnad", data), 64); err != nil {
+		output.Driftkostnad = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("price", data), 64); err != nil {
+		output.Price = &v
+	}
+	if v, err := strconv.ParseFloat(parseJson("price_per_m2", data), 64); err != nil {
+		output.PricePerM2 = &v
+	}
 	return output, nil
 }
 
