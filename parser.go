@@ -12,10 +12,10 @@ import (
 )
 
 // Parse parses information from URL to output object
-func Parse(url string) (Output, error) {
-	res, err := http.Get(url)
+func Parse(rawURL string) (Output, error) {
+	res, err := http.Get(rawURL)
 	if err != nil {
-		return Output{}, fmt.Errorf("Error when get data from url %v: %v", url, err)
+		return Output{}, fmt.Errorf("Error when get data from url %v: %v", rawURL, err)
 	}
 
 	defer res.Body.Close()
@@ -25,13 +25,13 @@ func Parse(url string) (Output, error) {
 
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return Output{}, fmt.Errorf("Got read data from website: %v, %s", url, err)
+		return Output{}, fmt.Errorf("Got read data from website: %v, %s", rawURL, err)
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(data)))
 	if err != nil {
-		return Output{}, fmt.Errorf("Got read data from website: %v, %s", url, err)
+		return Output{}, fmt.Errorf("Got read data from website: %v, %s", rawURL, err)
 	}
 
 	re := regexp.MustCompile("\"construction_year\":\"(\\w+)\"")
@@ -41,9 +41,21 @@ func Parse(url string) (Output, error) {
 		constructionYear = matches[len(matches)-1]
 	}
 
+	// Check sold property
+	if soldButton := doc.Find(".removed-listing__button"); soldButton != nil {
+		if v, exists := soldButton.Attr("href"); exists {
+			if !strings.HasPrefix(v, "http") {
+				if resURL, err := res.Location(); err == nil && resURL != nil {
+					v = fmt.Sprintf("%s://%s/%s", resURL.Scheme, resURL.Host, v)
+				}
+			}
+			return Parse(v)
+		}
+	}
+
 	// Find the review items
 	output := Output{
-		URL:        url,
+		URL:        rawURL,
 		StreetName: StringValueOrNil(doc.Find(".property-address__street").Text()),
 		Area:       StringValueOrNil(doc.Find(".property-address__area").Text()),
 		AreaDetail: AreaDetail{
