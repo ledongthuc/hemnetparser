@@ -106,7 +106,9 @@ func parseJson(key string, documentB []byte) string {
 	inQuotes := false
 	for i := matches[1]; i < len(document); i++ {
 		lastChar = document[i]
-		if !inQuotes && document[i] == ',' {
+		if !inQuotes && (document[i] == ',' || document[i] == '}') {
+			// "key":"value", ...
+			// "key":"value"} ...
 			break
 		}
 		if document[i] == '"' {
