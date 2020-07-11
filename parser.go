@@ -69,6 +69,9 @@ func Parse(rawURL string) (Output, error) {
 		Tenure:           StringValueOrNil(parseJson("tenure", data)),
 		Status:           parseStatus(data),
 	}
+	if output.StreetName == nil || *output.StreetName == "" {
+		output.StreetName = StringValueOrNil(parseJson("streetAddress", data))
+	}
 	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err == nil {
 		output.NumberOfRooms = &v
 	}
