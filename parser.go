@@ -42,7 +42,7 @@ func Parse(rawURL string) (Output, error) {
 	}
 
 	// Check sold property
-	if soldButton := doc.Find(".removed-listing__button"); soldButton != nil {
+	if soldButton := getListingButton(doc); soldButton != nil {
 		if v, exists := soldButton.Attr("href"); exists {
 			if !strings.HasPrefix(v, "http") {
 				if resURL, err := res.Location(); err == nil && resURL != nil {
@@ -147,5 +147,17 @@ func parseSellingPrice(documentB []byte, doc *goquery.Document, status Status) *
 			return &v
 		}
 	}
+	return nil
+}
+
+func getListingButton(doc *goquery.Document) *goquery.Selection {
+	if soldButton := doc.Find(".removed-listing__button"); soldButton != nil && len(doc.Find(".removed-listing__button").Nodes) > 0 {
+		return soldButton
+	}
+
+	if soldButton := doc.Find(".qa-removed-listing-button"); soldButton != nil && len(doc.Find(".qa-removed-listing-button").Nodes) > 0 {
+		return soldButton
+	}
+
 	return nil
 }
