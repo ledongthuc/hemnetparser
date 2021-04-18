@@ -56,7 +56,7 @@ func Parse(rawURL string) (Output, error) {
 	// Find the review items
 	output := Output{
 		URL:        rawURL,
-		StreetName: StringValueOrNil(doc.Find(".property-address__street").Text()),
+		StreetName: StringValueOrNil(parseJson("street_address", data)),
 		Area:       StringValueOrNil(doc.Find(".property-address__area").Text()),
 		AreaDetail: AreaDetail{
 			PostalCity:   StringValueOrNil(parseJson("postal_city", data)),
