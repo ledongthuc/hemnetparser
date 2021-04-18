@@ -56,7 +56,7 @@ func Parse(rawURL string) (Output, error) {
 	// Find the review items
 	output := Output{
 		URL:        rawURL,
-		StreetName: StringValueOrNil(parseJson("street_address", data)),
+		StreetName: StringValueOrNil(doc.Find(".property-address__street").Text()),
 		Area:       StringValueOrNil(doc.Find(".property-address__area").Text()),
 		AreaDetail: AreaDetail{
 			PostalCity:   StringValueOrNil(parseJson("postal_city", data)),
@@ -71,6 +71,9 @@ func Parse(rawURL string) (Output, error) {
 	}
 	if output.StreetName == nil || *output.StreetName == "" {
 		output.StreetName = StringValueOrNil(parseJson("streetAddress", data))
+		if output.StreetName == nil || *output.StreetName == "" {
+			output.StreetName = StringValueOrNil(parseJson("street_Address", data))
+		}
 	}
 	if v, err := strconv.ParseFloat(parseJson("rooms", data), 32); err == nil {
 		output.NumberOfRooms = &v
