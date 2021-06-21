@@ -1,4 +1,6 @@
-[![CircleCI](https://circleci.com/gh/ledongthuc/hemnetparser.svg?style=svg)](https://circleci.com/gh/ledongthuc/hemnetparser) [![GoDoc](https://godoc.org/github.com/ledongthuc/hemnetparser?status.svg)](https://godoc.org/github.com/ledongthuc/hemnetparser) [![Go Report Card](https://goreportcard.com/badge/github.com/ledongthuc/hemnetparser)](https://goreportcard.com/report/github.com/ledongthuc/hemnetparser)
+
+[![Built with WeBuild](https://raw.githubusercontent.com/webuild-community/badge/master/svg/WeBuild.svg)](https://webuild.community)
+ [![CircleCI](https://circleci.com/gh/ledongthuc/hemnetparser.svg?style=svg)](https://circleci.com/gh/ledongthuc/hemnetparser) [![GoDoc](https://godoc.org/github.com/ledongthuc/hemnetparser?status.svg)](https://godoc.org/github.com/ledongthuc/hemnetparser) [![Go Report Card](https://goreportcard.com/badge/github.com/ledongthuc/hemnetparser)](https://goreportcard.com/report/github.com/ledongthuc/hemnetparser)
 
 # Hemnet Parser
 
